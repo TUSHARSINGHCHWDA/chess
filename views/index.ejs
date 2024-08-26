@@ -17,8 +17,7 @@
 
       .piece.white {
         color: white;
-        /* filter : drop-shadow(0 0 2px rgba(0, 0, 0, 1)); */
-      } 
+      }
 
       .piece.black {
         color: black;
@@ -29,12 +28,12 @@
       }
 
       .square {
-        display : flex;
-        align-items : center;
+        display: flex;
+        align-items: center;
         justify-content: center;
       }
 
-      .square.light{
+      .square.light {
         background-color: #f0d9b5;
       }
 
@@ -43,11 +42,7 @@
       }
 
       .piece {
-        font-size : 36px;
-        cursor: p
-      }
-
-      .piece.draggable {
+        font-size: 36px;
         cursor: grab;
       }
 
@@ -60,27 +55,20 @@
         transform: rotate(180deg);
       }
     </style>
-
   </head>
   <body>
-    <h1>Chaliye firse shuru karte hai</h1>
-    <div class="w-full h-screen flex items-center justify-center bg-zinc-900">
-      <div class="chessboard w-96 h-96 bg-red-800">
-
-      </div>
+    
+    <div id="turnIndicator" class="flex flex-col items-center space-y-4">
+      <!-- Button will be rendered here -->
+  </div>
+    <div class="w-full h-screen flex flex-col items-center justify-center bg-zinc-900">
+      <div id="turnIndicator" class="text-white mb-4"></div>
+      <div class="chessboard w-96 h-96 bg-red-800"></div>
     </div>
 
-    <script
-      src="https://cdn.socket.io/4.7.5/socket.io.min.js"
-      integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"
-      integrity="sha512-xRllwz2gdZciIB+AkEbeq+gVhX8VB8XsfqeFbUh+SzHlN96dEduwtTuVuc2u9EROlmW9+yhRlxjif66ORpsgVA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     <script src="../scripts/chessgame.js"></script>
+    
   </body>
 </html>

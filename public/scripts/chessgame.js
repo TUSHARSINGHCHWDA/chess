@@ -1,16 +1,47 @@
 const socket = io();
 const chess = new Chess();
 const boardElement = document.querySelector(".chessboard");
+const turnIndicator = document.getElementById("turnIndicator");
 
 let draggedPiece = null;
 let sourceSquare = null;
 let playerRole = null;
 
+socket.on("connect", () => {
+  console.log("Connected to server");
+});
+
+socket.on("turnUpdate", (isYourTurn) => {
+  updateTurnIndicator(isYourTurn);
+});
+
+function updateTurnIndicator(isYourTurn) {
+  const turnIndicator = document.getElementById("turnIndicator");
+  turnIndicator.innerHTML = ""; // Clear previous content
+
+  const button = document.createElement("button");
+  button.className = "px-6 py-3 text-white font-semibold rounded-lg shadow-md";
+
+  if (isYourTurn) {
+    button.textContent = "Your Turn";
+    button.classList.add("bg-green-500", "hover:bg-green-600");
+  } else {
+    button.textContent = "Others' Turn";
+    button.classList.add("bg-blue-500", "hover:bg-blue-600");
+  }
+
+  button.onclick = () => {
+    socket.emit("changeTurn"); // Notify server to change turn
+  };
+
+  turnIndicator.appendChild(button);
+}
+
 // Function to render the chessboard
 const renderBoard = () => {
   const board = chess.board();
   boardElement.innerHTML = "";
-  
+
   board.forEach((row, rowIndex) => {
     row.forEach((square, squareIndex) => {
       const squareElement = document.createElement("div");
@@ -66,10 +97,10 @@ const renderBoard = () => {
     });
   });
 
-  if (playerRole === 'b') {
-    boardElement.classList.add('flipped');
+  if (playerRole === "b") {
+    boardElement.classList.add("flipped");
   } else {
-    boardElement.classList.remove('flipped');
+    boardElement.classList.remove("flipped");
   }
 };
 
@@ -78,13 +109,14 @@ const handleMove = (source, target) => {
   const move = {
     from: `${String.fromCharCode(97 + source.col)}${8 - source.row}`,
     to: `${String.fromCharCode(97 + target.col)}${8 - target.row}`,
-    promotion: 'q' // Always promote to a queen for simplicity
+    promotion: "q", // Always promote to a queen for simplicity
   };
 
   const result = chess.move(move);
   if (result) {
-    socket.emit('move', move);
+    socket.emit("move", move);
   } else {
+    alert("Invalid move!"); // Alert the user of invalid move
     renderBoard();
   }
 };
@@ -92,32 +124,51 @@ const handleMove = (source, target) => {
 // Function to get the Unicode character for each chess piece
 const getPieceUnicode = (piece) => {
   const unicodePieces = {
-    p: "♟", r: "♜", n: "♞", b: "♝", q: "♛", k: "♚",
-    P: "♙", R: "♖", N: "♘", B: "♗", Q: "♕", K: "♔"
+    p: "♟",
+    r: "♜",
+    n: "♞",
+    b: "♝",
+    q: "♛",
+    k: "♚",
+    P: "♙",
+    R: "♖",
+    N: "♘",
+    B: "♗",
+    Q: "♕",
+    K: "♔",
   };
 
-  return unicodePieces[piece.type] || '';
+  return unicodePieces[piece.type] || "";
 };
 
 // Handling different socket events
-socket.on('playerRole', (role) => {
+socket.on("playerRole", (role) => {
   playerRole = role;
   renderBoard();
 });
 
-socket.on('spectatorRole', () => {
+socket.on("spectatorRole", () => {
   playerRole = null;
   renderBoard();
 });
 
-socket.on('boardState', (fen) => {
+socket.on("boardState", (fen) => {
   chess.load(fen);
   renderBoard();
 });
 
-socket.on('move', (move) => {
+socket.on("move", (move) => {
   chess.move(move);
   renderBoard();
+});
+
+socket.on("currentTurn", (turn) => {
+  const turnText = turn === "w" ? "White's turn" : "Black's turn";
+  turnIndicator.innerText = turnText;
+});
+
+socket.on("invalidMove", (msg) => {
+  alert(msg); // Show an alert for an invalid move
 });
 
 // Initial render
